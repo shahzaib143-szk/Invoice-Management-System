@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+═══════════════════════════════════════════════════════════
+-->
+<!-- invoice-form.fxml -->
+<!-- REPLACES: InvoiceMenu Scanner input + println output -->
+<!--
+═══════════════════════════════════════════════════════════
+-->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<BorderPane style="-fx-padding: 20; -fx-background-color: #f9f9f9;"
+xmlns:fx="http://javafx.com/fxml"
+fx:controller="com.ims.gui.controller.InvoiceController">
+<top>
+<Label text="Invoice Management"
+style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"/>
+</top>
+<left>
+<VBox spacing="10" style="-fx-padding: 0 20 0 0;" prefWidth="300">
+<!-- Customer selection — replaces: System.out.print("Customer ID: ") -->
+<Label text="Select Customer" style="-fx-font-weight: bold;"/>
+<ComboBox fx:id="customerComboBox" prefWidth="280"
+promptText="Choose customer..."/>
+<Separator/>
+<!-- Product selection — replaces: Product ID input loop -->
+<Label text="Add Product to Cart" style="-fx-font-weight: bold;"/>
+<ComboBox fx:id="productComboBox" prefWidth="280"
+promptText="Choose product..."/>
+<TextField fx:id="quantityField" promptText="Quantity"/>
+<HBox spacing="10">
+<Button text="Add to Cart" onAction="#addToCart" prefWidth="130"
+style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+<Button text="Remove Item" onAction="#removeFromCart" prefWidth="130"
+style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+</HBox>
+<Separator/>
+<!-- Tax and discount — replaces: System.out.print("Tax rate: ") -->
+<Label text="Tax and Discount" style="-fx-font-weight: bold;"/>
+<TextField fx:id="taxField" promptText="Tax rate (e.g. 0.10)"/>
+<TextField fx:id="discountField" promptText="Discount (e.g. 0.05)"/>
+<Separator/>
+<!-- Total label — replaces: System.out.println("Total: " + total) -->
+<Label fx:id="totalLabel" text="Total: 0.00"
+style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+<Label fx:id="statusLabel" text=""
+style="-fx-text-fill: #27ae60;"/>
+<!-- Create Invoice — replaces: svc.createInvoice(...) -->
+<Button text="🧾 Create Invoice" onAction="#createInvoice"
+prefWidth="280" prefHeight="45"
+style="-fx-font-size: 14px; -fx-background-color: #e67e22; -fx-text-fill: white;"/>
+<Button text="View All Invoices" onAction="#viewAllInvoices"
+prefWidth="280"
+style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+<Button text="Refresh" onAction="#refreshData"
+prefWidth="280"
+style="-fx-background-color: #95a5a6; -fx-text-fill: white;"/>
+</VBox>
+</left>
+<!-- Cart table — shows items before invoice is created -->
+<center>
+<VBox spacing="5">
+<Label text="Cart" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+<TableView fx:id="cartTable">
+<columns>
+<TableColumn fx:id="cartProductIdColumn" text="Product ID" prefWidth="90"/>
+<TableColumn fx:id="cartProductNameColumn" text="Product" prefWidth="180"/>
+<TableColumn fx:id="cartQuantityColumn" text="Qty" prefWidth="60"/>
+<TableColumn fx:id="cartUnitPriceColumn" text="Unit Price" prefWidth="100"/>
+<TableColumn fx:id="cartSubtotalColumn" text="Subtotal" prefWidth="100"/>
+</columns>
+</TableView>
+</VBox>
+</center>
+</BorderPane>

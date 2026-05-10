@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ims.gui.controller.LoginController"
+      alignment="CENTER"
+      spacing="15"
+      prefWidth="400"
+      prefHeight="300">
+
+    <Label text="Invoice Management System"/>
+
+    <TextField fx:id="usernameField"
+               promptText="Username"
+               maxWidth="250"/>
+
+    <PasswordField fx:id="passwordField"
+                   promptText="Password"
+                   maxWidth="250"/>
+
+    <Button text="Login"
+            onAction="#handleLogin"
+            maxWidth="250"/>
+
+    <Label fx:id="errorLabel"/>
+
+</VBox>

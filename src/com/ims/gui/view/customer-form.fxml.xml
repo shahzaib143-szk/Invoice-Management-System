@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+═══════════════════════════════════════════════════════════
+-->
+<!-- product-table.fxml -->
+<!-- REPLACES: ProductMenu Scanner input + println output -->
+<!--
+═══════════════════════════════════════════════════════════
+-->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<BorderPane style="-fx-padding: 20; -fx-background-color: #f9f9f9;"
+xmlns:fx="http://javafx.com/fxml"
+fx:controller="com.ims.gui.controller.ProductController">
+<top>
+<Label text="Product Management"
+style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"/>
+</top>
+<left>
+<VBox spacing="10" style="-fx-padding: 0 20 0 0;" prefWidth="280">
+<Label text="Add / Edit Product" style="-fx-font-weight: bold;"/>
+<!-- Replace Scanner input lines -->
+<TextField fx:id="nameField" promptText="Product Name"/>
+<TextField fx:id="descriptionField" promptText="Description"/>
+<TextField fx:id="priceField" promptText="Price"/>
+<TextField fx:id="stockField" promptText="Stock Quantity"/>
+<HBox spacing="10">
+<Button text="Save" onAction="#saveProduct" prefWidth="125"
+style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+<Button text="Update Price" onAction="#updatePrice" prefWidth="125"
+style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+</HBox>
+<Separator/>
+<!-- Search — replaces: search() method in ProductMenu -->
+<Label text="Search Products" style="-fx-font-weight: bold;"/>
+<TextField fx:id="searchField" promptText="Keyword"/>
+<HBox spacing="10">
+<Button text="Search" onAction="#searchProducts" prefWidth="125"
+style="-fx-background-color: #8e44ad; -fx-text-fill: white;"/>
+<Button text="Refresh" onAction="#refreshProducts" prefWidth="125"
+style="-fx-background-color: #95a5a6; -fx-text-fill: white;"/>
+</HBox>
+</VBox>
+</left>
+<!-- Table replaces: list.forEach(System.out::println) -->
+<center>
+<TableView fx:id="productTable" onMouseClicked="#fillFormFromSelection">
+<columns>
+<TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+<TableColumn fx:id="nameColumn" text="Name" prefWidth="150"/>
+<TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200"/>
+<TableColumn fx:id="priceColumn" text="Price" prefWidth="100"/>
+<TableColumn fx:id="stockColumn" text="Stock" prefWidth="80"/>
+</columns>
+</TableView>
+</center>
+</BorderPane>

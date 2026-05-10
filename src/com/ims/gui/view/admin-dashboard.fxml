@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ims.gui.controller.AdminDashboardController"
+            prefWidth="900" prefHeight="650"
+            style="-fx-background-color: #ecf0f1;">
+
+    <top>
+        <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #2c3e50;">
+            <Label text="Admin Dashboard"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label fx:id="welcomeLabel"
+                   text="Welcome, Admin"
+                   style="-fx-text-fill: #ecf0f1;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" alignment="CENTER">
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Customers" onAction="#openCustomers"
+                        prefWidth="160" prefHeight="45"/>
+                <Button text="Products" onAction="#openProducts"
+                        prefWidth="160" prefHeight="45"/>
+                <Button text="Invoices" onAction="#openInvoices"
+                        prefWidth="160" prefHeight="45"/>
+            </HBox>
+
+            <Button text="Logout" onAction="#logout"
+                    prefWidth="160" prefHeight="40"
+                    style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <VBox padding="20">
+            <Label text="Admin has full control over customers, products, and invoices."
+                   style="-fx-text-fill: #7f8c8d;"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>

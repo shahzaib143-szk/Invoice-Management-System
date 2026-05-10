@@ -1,0 +1,31 @@
+MainApp = JavaFX bootstrap / entry point
+SceneNavigator = screen-switching utility
+CustomerController, ProductController, InvoiceController = event-handling UI controllers
+.fxml files = the actual visual screens
+InvoiceService, DAO classes, model classes = backend
+
+So the architecture is:
+
+MainApp
+   ↓
+FXML screen
+   ↓
+Controller
+   ↓
+Service
+   ↓
+DAO
+   ↓
+DB
+What this means for your project
+
+If you have:
+
+MainApp.java ✅
+SceneNavigator.java ✅
+controller classes ✅
+.fxml files ✅ and wired properly
+
+then you do have a GUI.
+
+If you have the first three but no .fxml screens or they are not connected, then you have only the GUI framework/presentation layer skeleton, not a complete visual GUI yet.

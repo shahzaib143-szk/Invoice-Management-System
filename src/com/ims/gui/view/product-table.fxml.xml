@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+═══════════════════════════════════════════════════════════
+-->
+<!-- customer-form.fxml -->
+<!-- REPLACES: CustomerMenu Scanner input + println output -->
+<!--
+═══════════════════════════════════════════════════════════
+-->
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<BorderPane style="-fx-padding: 20; -fx-background-color: #f9f9f9;"
+xmlns:fx="http://javafx.com/fxml"
+fx:controller="com.ims.gui.controller.CustomerController">
+<!-- TOP: Title -->
+<top>
+<Label text="Customer Management"
+style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 0 0 15 0;"/>
+</top>
+<!-- LEFT: Input form — replaces Scanner input lines -->
+<left>
+<VBox spacing="10" style="-fx-padding: 0 20 0 0;" prefWidth="280">
+<Label text="Add / Edit Customer"
+style="-fx-font-weight: bold;"/>
+<!-- Each TextField replaces one sc.nextLine() call -->
+<TextField fx:id="nameField" promptText="Full Name"/>
+<TextField fx:id="emailField" promptText="Email"/>
+<TextField fx:id="phoneField" promptText="Phone"/>
+<TextField fx:id="addressField" promptText="Address"/>
+<HBox spacing="10">
+<!-- Save button replaces: svc.addCustomer(...) -->
+<Button text="Save" onAction="#saveCustomer" prefWidth="85"
+style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+<!-- Update button replaces: svc.updateCustomer(...) -->
+<Button text="Update" onAction="#updateCustomer" prefWidth="85"
+style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+<!-- Delete button replaces: svc.deleteCustomer(...) -->
+<Button text="Delete" onAction="#deleteCustomer" prefWidth="85"
+style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+</HBox>
+<Button text="Refresh" onAction="#refreshCustomers" prefWidth="265"
+style="-fx-background-color: #95a5a6; -fx-text-fill: white;"/>
+</VBox>
+</left>
+<!-- CENTER: Table — replaces list.forEach(System.out::println) -->
+<center>
+<TableView fx:id="customerTable" onMouseClicked="#fillFormFromSelection">
+<columns>
+<TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+<TableColumn fx:id="nameColumn" text="Name" prefWidth="150"/>
+<TableColumn fx:id="emailColumn" text="Email" prefWidth="200"/>
+<TableColumn fx:id="phoneColumn" text="Phone" prefWidth="120"/>
+<TableColumn fx:id="addressColumn" text="Address" prefWidth="200"/>
+</columns>
+</TableView>
+</center>
+</BorderPane>

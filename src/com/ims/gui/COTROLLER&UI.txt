@@ -1,0 +1,69 @@
+Yes — this is exactly what I meant.
+
+You are **at the Controller / UI layer** now.
+
+These classes are not the backend and not the database layer. They are the **bridge between the JavaFX screen and your existing services**.
+
+```text
+JavaFX UI
+    ↓
+Controller   ← you are here
+    ↓
+Service
+    ↓
+DAO
+    ↓
+DB
+```
+
+## What your code proves
+
+`InvoiceController`, `CustomerController`, and `ProductController` all do controller work:
+
+* read values from `TextField`, `ComboBox`, `TableView`
+* react to button clicks with `@FXML`
+* call service methods like `customerService.addCustomer(...)`
+* show alerts to the user
+* refresh table data
+* move data between UI and backend
+
+That is exactly controller responsibility.
+
+## What is not controller work
+
+These classes do **not** contain:
+
+* SQL
+* JDBC
+* database connections
+* invoice/business rules
+* stock update logic
+* tax calculation logic
+
+Those stay in the **service / DAO layers**.
+
+## So your position is:
+
+You have moved from:
+
+```text
+Console menus → controller-style thinking
+```
+
+to:
+
+```text
+real JavaFX controllers
+```
+
+That means the GUI transition is not just planned anymore. The controller layer has started.
+
+## One clean way to describe your project now
+
+> Backend is already built.
+> JavaFX controllers are now being added on top of it.
+> The backend stays the same.
+
+That is the correct architectural reading of your code.
+
+One small note: your `CartRow` is fine as a simple internal UI model, though later it may be cleaner to use JavaFX properties if you want automatic live updates without `refresh()`.
