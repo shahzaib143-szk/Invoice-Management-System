@@ -1,131 +1,135 @@
 package com.ims.dao;
 
-import com.ims.model.InvoiceItem;
-import com.ims.model.Product;
+import com.ims.model.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * InvoiceItemDAO
- *
- * DAO Rule: ONLY SQL + ResultSet mapping. Zero business logic here.
- *
- * Concepts demonstrated:
- *   PreparedStatement → every SQL uses ? placeholders
- *   Batch insert      → all items inserted in one DB call (efficient)
- *   Generated keys    → item_id read back after batch insert
- *   Object mapping    → ResultSet rows → InvoiceItem objects
- *   Relationships     → item links to invoice (FK) and product (FK)
- *                       ProductDAO called to reconstruct Product object
- */
-public class InvoiceItemDAO {
+public class InvoiceDAO {
 
-    private final Connection conn       = DBConnection.getConnection();
-    private final ProductDAO productDAO = new ProductDAO();
+    private final Connection conn = DBConnection.getConnection();
+    private final CustomerDAO customerDAO = new CustomerDAO();
+    private final InvoiceItemDAO invoiceItemDAO = new InvoiceItemDAO();
 
+    public boolean createInvoice(Invoice inv) {
+        String sql = "INSERT INTO invoices (customer_id, invoice_date, tax_rate, discount_rate, total_amount, status) VALUES (?, ?, ?, ?, ?, ?)";
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // BATCH INSERT — all items for one invoice saved in one DB call
-    //
-    // Why batch insert:
-    //   One invoice can have 5, 10, 20 products
-    //   Sending one INSERT per product = slow (many DB round trips)
-    //   Batch insert = all rows sent together = fast (one DB round trip)
-    //
-    // Relationship:
-    //   FK: invoice_items.invoice_id → invoices.invoice_id
-    //   FK: invoice_items.product_id → products.product_id
-    // ═════════════════════════════════════════════════════════════════════════
+        try {
+            conn.setAutoCommit(false);
 
-    public boolean insertItems(int invoiceId, List<InvoiceItem> items) {
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, inv.getCustomer().getCustomerId());
+                ps.setDate(2, Date.valueOf(inv.getInvoiceDate()));
+                ps.setDouble(3, inv.getTaxRate());
+                ps.setDouble(4, inv.getDiscountRate());
+                ps.setDouble(5, inv.getTotalAmount());
+                ps.setString(6, inv.getStatus().name());
 
-        String sql = "INSERT INTO invoice_items "
-                   + "(invoice_id, product_id, quantity, unit_price, subtotal) "
-                   + "VALUES (?, ?, ?, ?, ?)";
+                ps.executeUpdate();
 
-        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ResultSet keys = ps.getGeneratedKeys();
+                if (keys.next()) {
+                    int invoiceId = keys.getInt(1);
+                    inv.setInvoiceId(invoiceId);
 
-            // Build batch — add each item as one batch entry
-            for (InvoiceItem item : items) {
-
-                // PreparedStatement — each ? set safely
-                ps.setInt(1, invoiceId);                          // FK → invoices
-                ps.setInt(2, item.getProduct().getProductId());   // FK → products
-                ps.setInt(3, item.getQuantity());
-                ps.setDouble(4, item.getUnitPrice());             // snapshot price
-                ps.setDouble(5, item.getSubtotal());
-
-                ps.addBatch(); // add this row to the batch
-            }
-
-            // Execute all rows at once — one DB call for all items
-            int[] results = ps.executeBatch();
-
-            // Generated keys — read back item_ids for each inserted row
-            ResultSet keys = ps.getGeneratedKeys();
-            int index = 0;
-            while (keys.next() && index < items.size()) {
-                items.get(index).setItemId(keys.getInt(1)); // feed ID back
-                index++;
-            }
-
-            // Verify all rows were inserted
-            for (int result : results) {
-                if (result == Statement.EXECUTE_FAILED) {
-                    System.err.println("[InvoiceItemDAO] One or more items failed to insert.");
-                    return false;
+                    boolean itemsSaved = invoiceItemDAO.insertItems(invoiceId, inv.getItems());
+                    if (!itemsSaved) {
+                        conn.rollback();
+                        return false;
+                    }
                 }
-            }
 
-            return true;
+                conn.commit();
+                return true;
+
+            } catch (SQLException e) {
+                conn.rollback();
+                return false;
+            }
 
         } catch (SQLException e) {
-            System.err.println("[InvoiceItemDAO] insertItems failed: " + e.getMessage());
+            return false;
+
+        } finally {
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                // ignore
+            }
+        }
+    }
+
+    public Invoice getInvoiceById(int id) {
+        String sql = "SELECT * FROM invoices WHERE invoice_id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Invoice inv = mapRow(rs);
+                inv.setItems(invoiceItemDAO.getItemsByInvoiceId(id));
+                return inv;
+            }
+
+        } catch (SQLException e) {
+            // ignore
+        }
+        return null;
+    }
+
+    public List<Invoice> getAllInvoices() {
+        List<Invoice> list = new ArrayList<>();
+        String sql = "SELECT * FROM invoices ORDER BY invoice_date DESC";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            // ignore
+        }
+        return list;
+    }
+
+    public List<String> getCustomerInvoiceReport() {
+        List<String> report = new ArrayList<>();
+        String sql = "SELECT c.name, i.total_amount, i.invoice_date FROM customers c JOIN invoices i ON c.customer_id = i.customer_id ORDER BY i.invoice_date DESC";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                String line = "Customer: " + rs.getString("name") + " | Total: " + rs.getDouble("total_amount") + " | Date: " + rs.getDate("invoice_date");
+                report.add(line);
+            }
+        } catch (SQLException e) {
+            // ignore
+        }
+        return report;
+    }
+
+    public boolean updateStatus(int invoiceId, Invoice.Status status) {
+        String sql = "UPDATE invoices SET status = ? WHERE invoice_id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status.name());
+            ps.setInt(2, invoiceId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
             return false;
         }
     }
 
+    private Invoice mapRow(ResultSet rs) throws SQLException {
+        Customer customer = customerDAO.getCustomerById(rs.getInt("customer_id"));
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // READ — SELECT all items for one invoice
-    //
-    // Object mapping → each row → InvoiceItem object
-    // Relationship   → product_id FK used to fetch full Product object
-    //                  This reconstructs the full object from 2 tables
-    // ═════════════════════════════════════════════════════════════════════════
+        Invoice inv = new Invoice(customer, rs.getDouble("tax_rate"), rs.getDouble("discount_rate"));
+        inv.setInvoiceId(rs.getInt("invoice_id"));
+        inv.setInvoiceDate(rs.getDate("invoice_date").toLocalDate());
+        inv.setTotalAmount(rs.getDouble("total_amount"));
+        inv.setStatus(Invoice.Status.valueOf(rs.getString("status")));
 
-    public List<InvoiceItem> getItemsByInvoiceId(int invoiceId) {
-
-        List<InvoiceItem> list = new ArrayList<>();
-        String sql = "SELECT * FROM invoice_items WHERE invoice_id = ?";
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, invoiceId); // PreparedStatement — safe FK lookup
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-
-                // Object mapping — build InvoiceItem from row
-                InvoiceItem item = new InvoiceItem();
-                item.setItemId(rs.getInt("item_id"));
-                item.setQuantity(rs.getInt("quantity"));
-                item.setUnitPrice(rs.getDouble("unit_price")); // stored snapshot price
-                item.setSubtotal(rs.getDouble("subtotal"));
-
-                // Relationship — use FK product_id to fetch full Product object
-                int productId = rs.getInt("product_id");
-                Product product = productDAO.getProductById(productId);
-                item.setProduct(product); // attach Product to InvoiceItem
-
-                list.add(item);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("[InvoiceItemDAO] getItemsByInvoiceId failed: " + e.getMessage());
-        }
-        return list;
+        return inv;
     }
 }
