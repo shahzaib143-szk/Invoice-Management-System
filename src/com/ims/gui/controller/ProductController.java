@@ -8,40 +8,21 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-/**
- * ProductController — Product Screen Event Handler
- *
- * REPLACES: ProductMenu class inside Menus.java
- *
- * OLD console code:
- *   System.out.print("Name: ");  String name = sc.nextLine();
- *   System.out.print("Price: "); double price = Double.parseDouble(sc.nextLine());
- *   boolean ok = svc.addProduct(name, desc, price, qty);
- *
- * NEW: TextFields + Buttons + TableView
- *
- * SERVICE BINDING:
- *   Calls ProductService — same service your console menu called.
- *   ProductService → ProductDAO → MySQL
- */
 public class ProductController {
 
-    // ── FXML fields — replace Scanner input ───────────────────────────────────
     @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField priceField;
     @FXML private TextField stockField;
     @FXML private TextField searchField;
 
-    // Table — replaces: list.forEach(System.out::println)
-    @FXML private TableView<Product>              productTable;
-    @FXML private TableColumn<Product, Integer>   idColumn;
-    @FXML private TableColumn<Product, String>    nameColumn;
-    @FXML private TableColumn<Product, String>    descriptionColumn;
-    @FXML private TableColumn<Product, Double>    priceColumn;
-    @FXML private TableColumn<Product, Integer>   stockColumn;
+    @FXML private TableView<Product> productTable;
+    @FXML private TableColumn<Product, Integer> idColumn;
+    @FXML private TableColumn<Product, String> nameColumn;
+    @FXML private TableColumn<Product, String> descriptionColumn;
+    @FXML private TableColumn<Product, Double> priceColumn;
+    @FXML private TableColumn<Product, Integer> stockColumn;
 
-    // ── Service binding ───────────────────────────────────────────────────────
     private final ProductService productService = new ProductService();
     private final ObservableList<Product> productData = FXCollections.observableArrayList();
 
@@ -56,20 +37,14 @@ public class ProductController {
         loadProducts();
     }
 
-    // ── ADD PRODUCT button ─────────────────────────────────────────────────────
-    // REPLACES: addProduct() in ProductMenu
-    //
-    // OLD: svc.addProduct(name, desc, price, qty)
-    // NEW: same call — reads from TextFields
     @FXML
     private void saveProduct() {
         try {
-            String name  = nameField.getText().trim();
-            String desc  = descriptionField.getText().trim();
+            String name = nameField.getText().trim();
+            String desc = descriptionField.getText().trim();
             double price = Double.parseDouble(priceField.getText().trim());
-            int    stock = Integer.parseInt(stockField.getText().trim());
+            int stock = Integer.parseInt(stockField.getText().trim());
 
-            // Service binding — same method console menu called
             boolean success = productService.addProduct(name, desc, price, stock);
 
             if (success) {
@@ -85,7 +60,6 @@ public class ProductController {
         }
     }
 
-    // ── UPDATE PRICE button ────────────────────────────────────────────────────
     @FXML
     private void updatePrice() {
         Product selected = productTable.getSelectionModel().getSelectedItem();
@@ -111,26 +85,19 @@ public class ProductController {
         }
     }
 
-    // ── SEARCH button ──────────────────────────────────────────────────────────
-    // REPLACES: search() in ProductMenu
-    //
-    // OLD: svc.searchByName(kw).forEach(System.out::println)
-    // NEW: results shown in TableView
     @FXML
     private void searchProducts() {
         String keyword = searchField.getText() == null ? "" : searchField.getText().trim();
 
         if (keyword.isEmpty()) {
-            loadProducts(); // show all if search is empty
+            loadProducts();
             return;
         }
 
-        // Service binding — same searchByName() your console menu called
         productData.setAll(productService.searchByName(keyword));
         productTable.setItems(productData);
     }
 
-    // ── TABLE ROW CLICK — fill form ───────────────────────────────────────────
     @FXML
     private void fillFormFromSelection() {
         Product selected = productTable.getSelectionModel().getSelectedItem();
@@ -142,16 +109,12 @@ public class ProductController {
         stockField.setText(String.valueOf(selected.getStockQty()));
     }
 
-    // ── REFRESH button ────────────────────────────────────────────────────────
     @FXML
     private void refreshProducts() {
         searchField.clear();
         loadProducts();
     }
 
-    // ── PRIVATE HELPERS ───────────────────────────────────────────────────────
-
-    // REPLACES: viewAll() in ProductMenu
     private void loadProducts() {
         productData.setAll(productService.getAllProducts());
         productTable.setItems(productData);
