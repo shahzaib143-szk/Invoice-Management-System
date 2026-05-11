@@ -1,4 +1,4 @@
-# 🧾 IMS — Invoice & Inventory Management System
+# 🧾 IMS — Invoice Management System
 
 > A desktop-based business management application built with **Java**, **JavaFX**, **JDBC**, and **MySQL** — designed using Object-Oriented Programming principles and a clean layered software architecture.
 
