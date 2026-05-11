@@ -1,10 +1,3 @@
-// ============================================================
-// LoginController.java
-// PACKAGE: com.ims.gui.controller
-// PURPOSE:
-// Login screen event handling
-// ============================================================
-
 package com.ims.gui.controller;
 
 import com.ims.gui.util.SceneNavigator;
@@ -31,9 +24,6 @@ public class LoginController {
     private final AuthService authService
             = new AuthService();
 
-    // ========================================================
-    // LOGIN BUTTON
-    // ========================================================
     @FXML
     private void handleLogin(ActionEvent event) {
 
@@ -55,10 +45,6 @@ public class LoginController {
                 ((Node) event.getSource())
                         .getScene()
                         .getWindow();
-
-        // ====================================================
-        // ROLE-BASED ROUTING
-        // ====================================================
 
         if (user.isAdmin()) {
 
