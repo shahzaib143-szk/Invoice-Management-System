@@ -1,9 +1,3 @@
-// ============================================================
-// UserDashboardController.java
-// PACKAGE: com.ims.gui.controller
-// PURPOSE:
-// Restricted user dashboard
-// ============================================================
 
 package com.ims.gui.controller;
 
@@ -43,9 +37,6 @@ public class UserDashboardController {
     private final InvoiceService invoiceService
             = new InvoiceService();
 
-    // ========================================================
-    // INITIALIZE
-    // ========================================================
     @FXML
     private void initialize() {
 
@@ -67,9 +58,6 @@ public class UserDashboardController {
         );
     }
 
-    // ========================================================
-    // TABLE CONFIG
-    // ========================================================
     private void setupTable() {
 
         idColumn.setCellValueFactory(
@@ -89,10 +77,6 @@ public class UserDashboardController {
         );
     }
 
-    // ========================================================
-    // ACCESS RESTRICTION
-    // USER SEES ONLY OWN INVOICES
-    // ========================================================
     private void loadMyInvoices(int customerId) {
 
         List<Invoice> invoices = invoiceService
@@ -110,9 +94,6 @@ public class UserDashboardController {
         );
     }
 
-    // ========================================================
-    // LOGOUT
-    // ========================================================
     @FXML
     private void logout() {
 
